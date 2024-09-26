@@ -7,7 +7,7 @@ window.title("Breakout Game")
 window.resizable(0, 0)
 window.wm_attributes("-topmost", 1)
 
-canvas = tk.Canvas(window, width=600, height=400, bd=0, highlightthickness=0)
+canvas = tk.Canvas(window, width=600, height=400, bd=0, highlightthickness=0, bg="#2c2f33")
 canvas.pack()
 window.update()
 
@@ -17,7 +17,7 @@ ball_speed = 3
 ball_diameter = 20
 paddle_width = 100
 paddle_height = 10
-paddle_color = "#0095DD"
+paddle_color = "#7289da"
 brick_colors = ["#FF5733", "#33FF57", "#3357FF"]
 bricks = []
 
@@ -51,7 +51,7 @@ class Ball:
         self.canvas = canvas
         self.paddle = paddle
         self.bricks = bricks
-        self.ball = canvas.create_oval(0, 0, ball_diameter, ball_diameter, fill="red")
+        self.ball = canvas.create_oval(0, 0, ball_diameter, ball_diameter, fill="white")
         self.canvas.move(self.ball, 300, 200)
         self.x = random.choice([-ball_speed, ball_speed])
         self.y = -ball_speed
@@ -106,6 +106,15 @@ def create_bricks(canvas, rows, cols):
             brick = canvas.create_rectangle(x1, y1, x2, y2, fill=random.choice(brick_colors), outline="black")
             bricks.append(brick)
 
+# Restart the game
+def restart_game():
+    canvas.delete("all")
+    bricks.clear()
+    create_bricks(canvas, 5, 8)
+    global ball
+    ball = Ball(canvas, paddle, bricks)
+    game_loop()
+
 # Main game function
 def game_loop():
     if not ball.hit_bottom:
@@ -113,9 +122,11 @@ def game_loop():
         paddle.draw()
         if len(bricks) == 0:
             canvas.create_text(300, 200, text="You Win!", font=("Arial", 30), fill="green")
+            restart_button.pack()
             return
     else:
         canvas.create_text(300, 200, text="Game Over", font=("Arial", 30), fill="red")
+        restart_button.pack()
         return
     window.after(10, game_loop)
 
@@ -123,6 +134,10 @@ def game_loop():
 paddle = Paddle(canvas)
 ball = Ball(canvas, paddle, bricks)
 create_bricks(canvas, 5, 8)
+
+# Create a Restart button
+restart_button = tk.Button(window, text="Restart", command=restart_game, font=("Arial", 14), bg="#7289da", fg="white")
+restart_button.pack_forget()  # Hide the button initially
 
 # Start the game
 game_loop()
